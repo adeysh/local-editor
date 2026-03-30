@@ -2,9 +2,16 @@
 import * as Y from "yjs";
 import { useState, useEffect } from "react";
 import { IndexeddbPersistence } from "y-indexeddb";
+import { WebsocketProvider } from "y-websocket";
 
 const ydoc = new Y.Doc();
 const yText = ydoc.getText("editor");
+
+const provider = new WebsocketProvider("ws://localhost:1234", "my-doc", ydoc);
+
+provider.on("status", (event) => {
+  console.log(event.status); // connected / disconnected
+});
 
 export default function Home() {
   const [text, setText] = useState(() => yText.toString());
