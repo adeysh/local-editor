@@ -7,27 +7,23 @@ const ydoc = new Y.Doc();
 const yText = ydoc.getText("editor");
 
 export default function Home() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(() => yText.toString());
   const persistence = new IndexeddbPersistence("my-doc", ydoc);
 
   useEffect(() => {
-    // Initial load
-    setText(yText.toString());
-
-    // Listen for changes
-    yText.observe(() => {
+    const handleChange = () => {
       setText(yText.toString());
-    });
-  }, []);
+    };
 
-  useEffect(() => {
+    yText.observe(handleChange);
+
     persistence.whenSynced.then(() => {
       setText(yText.toString());
     });
 
-    yText.observe(() => {
-      setText(yText.toString());
-    });
+    return () => {
+      yText.unobserve(handleChange);
+    };
   }, []);
 
   const handleChange = (value: string) => {
