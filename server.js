@@ -1,9 +1,10 @@
-import * as Y from "@y/y";
-import { WebsocketProvider } from "y-websocket";
+import { WebSocketServer } from "ws";
+import { setupWSConnection } from "y-websocket/bin/utils";
 
-const doc = new Y.Doc();
-const wsProvider = new WebsocketProvider("ws://localhost:1234", "my-doc", doc);
+const wss = new WebSocketServer({ port: 1234 });
 
-wsProvider.on("status", (event) => {
-  console.log(event.status); // logs "connected" or "disconnected"
+wss.on("connection", (ws, req) => {
+  setupWSConnection(ws, req, { gc: true });
 });
+
+console.log("WebSocket server running on ws://localhost:1234");
