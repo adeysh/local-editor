@@ -1,34 +1,62 @@
 "use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { useState } from "react";
+import Document from "@tiptap/extension-document";
+import Paragraph from "@tiptap/extension-paragraph";
+import Text from "@tiptap/extension-text";
+import Bold from "@tiptap/extension-bold";
+import Italic from "@tiptap/extension-italic";
+import Heading from "@tiptap/extension-heading";
+import Collaboration from "@tiptap/extension-collaboration";
+
+import { ydoc } from "@/app/lib/yjs";
+import "@/app/lib/persistence";
+import { useEditorState } from "@tiptap/react";
 
 export default function Editor() {
-  const [, forceUpdate] = useState(0);
-
-  const refresh = () => {
-    forceUpdate((prev) => prev + 1);
-  };
-
-  const runCommand = (command: () => void) => {
-    command();
-    refresh();
-  };
-
   const editor = useEditor({
-    extensions: [StarterKit],
-    content: "<p>Start writing...</p>",
+    extensions: [
+      Document,
+      Paragraph,
+      Text,
+      Bold,
+      Italic,
+      Heading,
+
+      Collaboration.configure({
+        document: ydoc,
+      }),
+    ],
     immediatelyRender: false,
+  });
 
-    onUpdate: () => {
-      forceUpdate((prev) => prev + 1);
-    },
+  const editorState = useEditorState({
+    editor,
+    selector: ({ editor }) => {
+      if (!editor) {
+        return {
+          isBold: false,
+          isItalic: false,
+          isH1: false,
+          isH2: false,
+        };
+      }
 
-    onSelectionUpdate: () => {
-      forceUpdate((prev) => prev + 1);
+      return {
+        isBold: editor.isActive("bold"),
+        isItalic: editor.isActive("italic"),
+        isH1: editor.isActive("heading", { level: 1 }),
+        isH2: editor.isActive("heading", { level: 2 }),
+      };
     },
   });
+
+  const {
+    isBold = false,
+    isItalic = false,
+    isH1 = false,
+    isH2 = false,
+  } = editorState || {};
 
   if (!editor) return null;
 
@@ -37,44 +65,32 @@ export default function Editor() {
       {/* Toolbar */}
       <div className="flex gap-2 mb-4 border-b pb-2">
         <button
-          className={editor.isActive("bold") ? "bg-gray-300" : ""}
-          onClick={() =>
-            runCommand(() => editor.chain().focus().toggleBold().run())
-          }
+          className={isBold ? "bg-gray-300" : ""}
+          onClick={() => editor.chain().focus().toggleBold().run()}
         >
           Bold
         </button>
 
         <button
-          className={editor.isActive("italic") ? "bg-gray-300" : ""}
-          onClick={() =>
-            runCommand(() => editor.chain().focus().toggleItalic().run())
-          }
+          className={isItalic ? "bg-gray-300" : ""}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
         >
           Italic
         </button>
 
         <button
-          className={
-            editor.isActive("heading", { level: 1 }) ? "bg-gray-300" : ""
-          }
+          className={isH1 ? "bg-gray-300" : ""}
           onClick={() =>
-            runCommand(() =>
-              editor.chain().focus().toggleHeading({ level: 1 }).run(),
-            )
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
           }
         >
           H1
         </button>
 
         <button
-          className={
-            editor.isActive("heading", { level: 2 }) ? "bg-gray-300" : ""
-          }
+          className={isH2 ? "bg-gray-300" : ""}
           onClick={() =>
-            runCommand(() =>
-              editor.chain().focus().toggleHeading({ level: 2 }).run(),
-            )
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
           }
         >
           H2
