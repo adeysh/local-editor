@@ -33,3 +33,28 @@ body {
 .ProseMirror p {
   margin: 0.5em 0;
 }
+
+.ProseMirror h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.ProseMirror h2 {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+button {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+button:hover {
+  background: #f3f3f3;
+}
+
+button.bg-gray-300 {
+  background: #e5e7eb;
+  border-color: #999;
+}
