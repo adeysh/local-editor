@@ -12,6 +12,7 @@ import Collaboration from "@tiptap/extension-collaboration";
 import { ydoc } from "@/app/lib/yjs";
 import "@/app/lib/persistence";
 import { useEditorState } from "@tiptap/react";
+import "@/app/lib/ws-provider";
 
 export default function Editor() {
   const editor = useEditor({
